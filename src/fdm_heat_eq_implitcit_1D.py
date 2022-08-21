@@ -3,15 +3,9 @@ import numpy
 
 from src.utils import visu1D
 
-"""
-Original version was in Matlab. See [1] for further details.
-Translate to Python by TgDg.
-Reference: [1] Boualem Khouider, Finite difference and finite volume methods for transport and conservation laws.
-"""
-
 
 if __name__ == "__main__":
-    # FDM, forward difference, explicit scheme for the heat equation:
+    # FDM, implicit scheme for the heat equation:
     # INPUT
     # Advection velocity:
     mu = 1 / 16
