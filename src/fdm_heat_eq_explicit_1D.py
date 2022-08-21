@@ -16,9 +16,9 @@ if __name__ == "__main__":
     # Advection velocity:
     mu = 1 / 16
     # Grid size; Use periodic boundary conditions
-    X, M, Tend = 1, 10, 1
+    X, M, Tend = 1, 50, 1
     h = 1 / (M + 1)
-    Dt = 0.02
+    Dt = 0.001
     x = numpy.linspace(0, X, M + 2)  # x(1) =0, x(2) = h, , ..., x(M) = X -h; x(M+1) = X;
     wn = numpy.sin(2 * math.pi * x)
     time = 0

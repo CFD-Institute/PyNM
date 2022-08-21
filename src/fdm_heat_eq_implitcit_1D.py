@@ -1,29 +1,46 @@
 import math
-import os
 import numpy
 
 from src.utils import visu1D
-from ctypes import POINTER, c_int, c_float, cdll
 
-"""
-MacOS: Before running this script, please build fortran library [1]:
-    gfortran -dynamiclib src/utils/tridiag.f90 -o src/tridiag.dylib
-There will be a file called 'tridiag.dylib' in the project src folder.
-Reference:
-[1] http://jean-pierre.moreau.pagesperso-orange.fr/Fortran/tridiag_f90.txt
-[2] https://stackoverflow.com/questions/19263879/speeding-up-element-wise-array-multiplication-in-python/19458585#19458585
-"""
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-FORTRAN_LIB_PATH = os.path.join(ROOT_DIR, 'tridiag.dylib')
-fortran = cdll.LoadLibrary(FORTRAN_LIB_PATH)
-fortran.tridiag.argtypes = [POINTER(c_float),
-                            POINTER(c_float),
-                            POINTER(c_float),
-                            POINTER(c_float),
-                            POINTER(c_float),
-                            POINTER(c_int),
-                            POINTER(c_int)]
-fortran.tridiag.restype = None
+
+def thomas(
+        a: numpy.ndarray,
+        b: numpy.ndarray,
+        c: numpy.ndarray,
+        r: numpy.ndarray,
+        u: numpy.ndarray,
+        n: int):
+    """
+
+    :param a:
+    :param b:
+    :param c:
+    :param r:
+    :param u:
+    :param n:
+    :return:
+    """
+    eps = 10**(-9)
+
+    if b[0] <= eps:
+        return
+
+    bet = b[0]
+    u[0] = r[0] / bet
+
+    gam = numpy.zeros(n)
+
+    for j in range(1, n):
+        gam[j] = c[j - 1] / bet
+        bet = b[j] - a[j] * gam[j]
+        if b[0] <= eps:
+            return
+        u[j] = (r[j] - a[j] * u[j - 1]) / bet
+
+    for j in range(n - 2, -1, -1):
+        u[j] = u[j] - gam[j + 1] * u[j + 1]
+
 
 if __name__ == "__main__":
     # FDM, implicit scheme for the heat equation:
@@ -31,7 +48,7 @@ if __name__ == "__main__":
     # Advection velocity:
     mu = 1 / 16
     # Grid size; Use periodic boundary conditions
-    X, M, Tend = 1, 10, 0.5
+    X, M, Tend = 1, 5000, 1
     h = 1 / (M + 1)
     Dt = 0.02
     x = numpy.linspace(0, X, M + 2)  # x(1) =0, x(2) = h, , ..., x(M) = X -h; x(M+1) = X;
@@ -53,16 +70,10 @@ if __name__ == "__main__":
 
     while time < Tend:
         a, b, c = A, B, C
-        code = -1
-        fortran.tridiag(a.ctypes.data_as(POINTER(c_float)),
-                        b.ctypes.data_as(POINTER(c_float)),
-                        b.ctypes.data_as(POINTER(c_float)),
-                        wm.ctypes.data_as(POINTER(c_float)),
-                        wn.ctypes.data_as(POINTER(c_float)),
-                        c_int(M + 2), c_int(code))
+        thomas(a, b, c, wm, wn, M + 2)
         wn = wm
 
         time += Dt
 
     w = numpy.exp(-time / 4 * math.pi ** 2) * numpy.sin(2 * math.pi * x)
-    visu1D.plot_solution(x, wn, w)
+    visu1D.plot_solution(x, wm, w)
