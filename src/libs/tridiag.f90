@@ -4,11 +4,10 @@ SUBROUTINE TRIDIAG(A, B, C, R, U, N, CODE) BIND(C, NAME='tridiag')
 ! M U = R, where A, B and C are the three main diagonals of matrix
 ! M(N,N), the other terms are 0. R is the right side vector.
 !*****************************************************************
-    USE ISO_C_BINDING, ONLY: C_FLOAT, C_INT
+    USE ISO_C_BINDING, ONLY: C_DOUBLE, C_INT
     IMPLICIT NONE
-    INTEGER, PARAMETER :: NMAX = 100
-    REAL(C_FLOAT), PARAMETER :: EPS = 1.0D-9
-    REAL(C_FLOAT) :: BET, GAM(NMAX), A(N), B(N), C(N), R(N), U(N)
+    REAL(C_DOUBLE), PARAMETER :: EPS = 1.0D-9
+    REAL(C_DOUBLE) :: BET, GAM(N+1), A(N), B(N), C(N), R(N), U(N)
     INTEGER(C_INT) :: J, N, CODE
 
     IF (B(1) <= EPS) THEN

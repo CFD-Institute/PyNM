@@ -3,11 +3,11 @@ import os
 import numpy
 
 from src.utils import visu1D
-from ctypes import POINTER, c_int, c_float, cdll
+from ctypes import POINTER, c_int, c_double, cdll
 
 """
 MacOS: Before running this script, please build fortran library [1]:
-    gfortran -dynamiclib src/utils/tridiag.f90 -o src/tridiag.dylib
+    src$ gfortran -shared -fPIC libs/tridiag.f90 -o tridiag.dylib
 There will be a file called 'tridiag.dylib' in the project src folder.
 Reference:
 [1] http://jean-pierre.moreau.pagesperso-orange.fr/Fortran/tridiag_f90.txt
@@ -15,15 +15,16 @@ Reference:
 """
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 FORTRAN_LIB_PATH = os.path.join(ROOT_DIR, 'tridiag.dylib')
-fortran = cdll.LoadLibrary(FORTRAN_LIB_PATH)
-fortran.tridiag.argtypes = [POINTER(c_float),
-                            POINTER(c_float),
-                            POINTER(c_float),
-                            POINTER(c_float),
-                            POINTER(c_float),
-                            POINTER(c_int),
-                            POINTER(c_int)]
-fortran.tridiag.restype = None
+fort_lib = cdll.LoadLibrary(FORTRAN_LIB_PATH)
+tri_diag = fort_lib.__getattr__("tridiag")
+tri_diag.argtypes = [POINTER(c_double),
+                     POINTER(c_double),
+                     POINTER(c_double),
+                     POINTER(c_double),
+                     POINTER(c_double),
+                     POINTER(c_int),
+                     POINTER(c_int)]
+tri_diag.restype = None
 
 if __name__ == "__main__":
     # FDM, implicit scheme for the heat equation:
@@ -31,7 +32,7 @@ if __name__ == "__main__":
     # Advection velocity:
     mu = 1 / 16
     # Grid size; Use periodic boundary conditions
-    X, M, Tend = 1, 10, 0.5
+    X, M, Tend = 1, 5000, 1
     h = 1 / (M + 1)
     Dt = 0.02
     x = numpy.linspace(0, X, M + 2)  # x(1) =0, x(2) = h, , ..., x(M) = X -h; x(M+1) = X;
@@ -51,15 +52,17 @@ if __name__ == "__main__":
     B = numpy.zeros(M + 2)
     B[:] = 1.0 + 2.0 * mu
 
+    code = c_int(-1)
+    n = c_int(M + 2)
+
     while time < Tend:
         a, b, c = A, B, C
-        code = -1
-        fortran.tridiag(a.ctypes.data_as(POINTER(c_float)),
-                        b.ctypes.data_as(POINTER(c_float)),
-                        b.ctypes.data_as(POINTER(c_float)),
-                        wm.ctypes.data_as(POINTER(c_float)),
-                        wn.ctypes.data_as(POINTER(c_float)),
-                        c_int(M + 2), c_int(code))
+        tri_diag(c.ctypes.data_as(POINTER(c_double)),
+                 b.ctypes.data_as(POINTER(c_double)),
+                 a.ctypes.data_as(POINTER(c_double)),
+                 wm.ctypes.data_as(POINTER(c_double)),
+                 wn.ctypes.data_as(POINTER(c_double)),
+                 n, code)
         wn = wm
 
         time += Dt
