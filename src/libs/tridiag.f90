@@ -1,4 +1,4 @@
-SUBROUTINE TRIDAG(A, B, C, R, U, N, CODE) BIND(C, NAME='tridiag')
+SUBROUTINE TRIDIAG(A, B, C, R, U, N, CODE) BIND(C, NAME='tridiag')
 !*****************************************************************
 ! Solves for a vector U of length N the tridiagonal linear set
 ! M U = R, where A, B and C are the three main diagonals of matrix
@@ -33,7 +33,6 @@ SUBROUTINE TRIDAG(A, B, C, R, U, N, CODE) BIND(C, NAME='tridiag')
     END DO
 
     CODE = 0
-    print*, u
     RETURN
 
-END SUBROUTINE TRIDAG
+END SUBROUTINE TRIDIAG
