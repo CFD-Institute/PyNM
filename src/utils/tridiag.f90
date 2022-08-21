@@ -1,14 +1,15 @@
-SUBROUTINE TRIDAG(A, B , C, R, U, N, CODE)
+SUBROUTINE TRIDAG(A, B, C, R, U, N, CODE) BIND(C, NAME='tridiag')
 !*****************************************************************
 ! Solves for a vector U of length N the tridiagonal linear set
 ! M U = R, where A, B and C are the three main diagonals of matrix
 ! M(N,N), the other terms are 0. R is the right side vector.
 !*****************************************************************
+    USE ISO_C_BINDING, ONLY: C_FLOAT, C_INT
     IMPLICIT NONE
     INTEGER, PARAMETER :: NMAX = 100
-    REAL(8), PARAMETER :: EPS = 1.0D-9
-    REAL(8) :: BET, GAM(NMAX), A(N), B(N), C(N), R(N), U(N)
-    INTEGER :: J, N, CODE
+    REAL(C_FLOAT), PARAMETER :: EPS = 1.0D-9
+    REAL(C_FLOAT) :: BET, GAM(NMAX), A(N), B(N), C(N), R(N), U(N)
+    INTEGER(C_INT) :: J, N, CODE
 
     IF (B(1) <= EPS) THEN
         CODE = 1
