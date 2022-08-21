@@ -33,6 +33,7 @@ SUBROUTINE TRIDAG(A, B, C, R, U, N, CODE) BIND(C, NAME='tridiag')
     END DO
 
     CODE = 0
+    print*, u
     RETURN
 
 END SUBROUTINE TRIDAG
