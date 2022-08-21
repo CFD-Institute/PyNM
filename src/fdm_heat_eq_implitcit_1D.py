@@ -1,5 +1,6 @@
 import math
 import numpy
+import time as timer
 
 from src.libs.tridiag import TriDiagonalMatrix
 from src.utils import visu1D
@@ -31,12 +32,16 @@ if __name__ == "__main__":
     B = numpy.zeros(M + 2)
     B[:] = 1.0 + 2.0 * mu
 
+    start = timer.time()
     while time < Tend:
         a, b, c = A, B, C
         TriDiagonalMatrix.thomas(a, b, c, wm, wn, M + 2)
         wn = wm
 
         time += Dt
+
+    end = timer.time()
+    print("Total elapsed time: ", end - start)
 
     w = numpy.exp(-time / 4 * math.pi ** 2) * numpy.sin(2 * math.pi * x)
     visu1D.plot_solution(x, wm, w)

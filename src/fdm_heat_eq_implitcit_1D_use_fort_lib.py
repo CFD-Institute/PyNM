@@ -1,6 +1,7 @@
 import math
 import os
 import numpy
+import time as timer
 
 from src.utils import visu1D
 from ctypes import POINTER, c_int, c_double, cdll
@@ -55,6 +56,7 @@ if __name__ == "__main__":
     code = c_int(-1)
     n = c_int(M + 2)
 
+    start = timer.time()
     while time < Tend:
         a, b, c = A, B, C
         tri_diag(c.ctypes.data_as(POINTER(c_double)),
@@ -66,6 +68,9 @@ if __name__ == "__main__":
         wn = wm
 
         time += Dt
+
+    end = timer.time()
+    print("Total elapsed time: ", end - start)
 
     w = numpy.exp(-time / 4 * math.pi ** 2) * numpy.sin(2 * math.pi * x)
     visu1D.plot_solution(x, wn, w)
