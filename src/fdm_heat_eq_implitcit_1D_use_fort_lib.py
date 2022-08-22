@@ -59,9 +59,9 @@ if __name__ == "__main__":
     start = timer.time()
     while time < Tend:
         a, b, c = A, B, C
-        tri_diag(c.ctypes.data_as(POINTER(c_double)),
+        tri_diag(a.ctypes.data_as(POINTER(c_double)),
                  b.ctypes.data_as(POINTER(c_double)),
-                 a.ctypes.data_as(POINTER(c_double)),
+                 c.ctypes.data_as(POINTER(c_double)),
                  wm.ctypes.data_as(POINTER(c_double)),
                  wn.ctypes.data_as(POINTER(c_double)),
                  n, code)
